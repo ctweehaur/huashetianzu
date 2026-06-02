@@ -35,9 +35,7 @@ const shortQData = [
             "tí qǔ chū tā zì dà chuī xuī de yuán huà nèi róng wú néng wéi zhī zú"
         ],
         sEn: "Step 1: Identify his physical movements after completing the snake (holding the cup while adding feet).<br>Step 2: Extract his boastful words ('I can even add feet to it').",
-        aZh: "他做出的多余举动是左手拿着酒杯准备喝，右手却继续在地上给蛇画脚。他当时得意地吹嘘说：“我能够给它画上脚！”",
-        aPy: "tā zuò chū de duō yú jǔ dòng cliché zuǒ shǒu ná zhe jiǔ bēi zhǔn bèi hē yòu shǒu què jì xù zài dì shàng gěi shé huà jiǎo tā dāng shí dé yì de chuī xuī shuō wǒ néng gòu gěi tā huà shàng jiǎo",
-        aEn: "His superfluous action was holding the cup with his left hand while using his right hand to add feet to the snake on the ground. He boasted self-complacently, 'I can even add feet to it!'"
+        aZh: "He made a redundant move by holding the wine cup with his left hand, ready to drink, while continuing to draw the feet of the snake on the ground with his right hand. He boasted proudly at that time, 'I can even add feet to it!'"
     },
     {
         id: "Q3",
@@ -50,11 +48,11 @@ const shortQData = [
         ],
         sPy: [
             "gài kuò dì èr gè rén qiǎng guò jiǔ bēi hòu duì dì yī gè rén shuō de huà shé gù wú zú",
-            "shuō míng tā fǎn bó de shēng wù cháng shí lǐ yóu shé běn lái jiù méi yǒu jiǎo huà shàng jiǎo de jiù gēn bēn bú shì shé le suǒ yǐ dì yī gè rén bìng méi yǒu zhēn zhèng wán chéng bǐ sài"
+            "shuō míng tā fǎn bó de shēng wù cháng shí lǐ yóu shé běn lái jiù méi yǒu jiǎo huà shàng jiǎo de jiù gēn běn bú shì shé le suǒ yǐ dì yī gè rén bìng méi yǒu zhēn zhèng wán chéng bǐ sài"
         ],
         sEn: "Step 1: Summarize the words spoken by the second man after grabbing the cup.<br>Step 2: Explain his factual counterargument: snakes naturally lack feet, so the first man had not actually drawn a valid snake.",
         aZh: "第二个人指出蛇本来就是没有脚的，你既然给它加上了脚，画出来的东西就根本不是蛇了。因此，第二个人认为自己才是最先画好真正的蛇的人，从而理直气壮地夺走了酒杯。",
-        aPy: "yīn wèi shè rén men rèn wéi zhè hú jiǔ rú guǒ shù rén yī qǐ fēn zhe hē jiù bú zú rú guǒ gěi yī rén dān dú hē jiù huì yǒu yú wèi le gōng píng jué dìng zhè hú jiǔ guī shéi dú xiǎng tā men cái jué dìng tōng guò zài dì shàng huà shé de bǐ sài lái dìng shèng fù",
+        aPy: "dì èr gè rén zhǐ chū shé běn lái jiù shì méi yǒu jiǎo de nǐ jì rán gěi tā jiā shàng le jiǎo huà chū lái de dōng xī jiù gēn běn bú shì shé le yīn cǐ dì èr gè rén rèn wéi zì jǐ cái shì zuì xiān huà hǎo zhēn zhèng de shé de rén cóng ér lǐ zhí qì zhuàng de duó zǒu le jiǔ bēi",
         aEn: "The second man pointed out that snakes naturally have no feet, so by adding feet, the creation ceased to be a snake. Therefore, he argued that he was the true winner who finished an actual snake first, justifying his reclamation of the cup."
     },
     {
@@ -67,12 +65,12 @@ const shortQData = [
             "2. 指出他脱离实际、多此一举，做了不符合客观事实的荒唐加法。"
         ],
         sPy: [
-            "shuō míng tā quē fá shì kě ér zhǐ de zhì huì yíng le bǐ sài hòu kāi shǐ jiāo ào xuàn yào xuàn yào jǐ gōng",
+            "shuō míng tā quē fá shì kě ér zhǐ de zhì huì yíng le bǐ sài hòu kāi shǐ jiāo ào xuàn yào xuàn yào jū gōng",
             "zhǐ chū tā tuō lí shí jì duō cǐ yī jǔ zuò le bù fú hé kè guān shì shí de huāng táng jiā fǎ"
         ],
         sEn: "Step 1: Explain his lack of discretion and immediate descent into arrogance and showing off after winning.<br>Step 2: Point out his redundant and counterfactual addition that corrupted his own success.",
         aZh: "他犯的致命错误是自作聪明、炫耀居功。他本来已经赢得了比赛，却缺乏适可而止的智慧，脱离实际地去做多余的事情（画蛇脚），最终白白把快到手的胜利果实拱手让人。",
-        aPy: "tā fàn de zhì mìng cuò wù shì zì zuò cōng míng xuàn yào jú gōng tā běn lái yǐ jīng yíng dé le bǐ sài  què quē fá shì kě ér zhǐ de zhì huì tuō lí shí jì dì qù zuò duō yú de shì qíng huà shé jiǎo zuì zhòu bái bái bǎ kuài dào shǒu de shèng lì guǒ shí gǒng shǒu ràng rén",
+        aPy: "tā fàn de zhì mìng cuò wù : zì zuò cōng míng xuàn yào jū gōng tā běn lái yǐ jīng yíng dé le bǐ sài què quē fá shì kě ér zhǐ de zhì huì tuō lí shí jì de qù zuò duō yú de shì qíng huà shé jiǎo zuì zhōng bái bái bǎ kuài dào shǒu de shèng lì guǒ shí gǒng shǒu ràng rén",
         aEn: "His fatal mistake was being overly clever and arrogant. Having already won, he lacked the wisdom to stop, choosing instead to engage in a redundant, counterfactual action that threw away his definitive victory."
     },
     {
@@ -86,7 +84,7 @@ const shortQData = [
         ],
         sPy: [
             "lián xì dà mǎ zhōng xué shí jì qíng kuàng tí chū jiào xùn zuò rèn hé shì qíng dōu yào dǒng dé shì kě ér zhǐ zuò dào fú hé biāo zhǔn jí kě bú yào huà shé tiān zú",
-            "jǔ chū jù tǐ kǎo shì lì zǐ lì rú xiě huá w文 zuò wén huò zuò yuè dú lǐ jiě shí huí dá qiè zhòng dé fēn diǎn jí kě bú yào xiě yī duī wú guān de duō yú fèi huà fǒu zé kě néng duō shuō duō cuò kòu chú fēn shù"
+            "jǔ chū jù tǐ kǎo shì lì zǐ lì rú xiě huá wén zuò wén huò zuò yuè dú lǐ jiě shí huí dá qiè zhòng dé fēn diǎn jí kě bú yào xiě yī duī wú guān de duō yú fèi huà fǒu zé kě néng duō shuō duō cuò kòu chú fēn shù"
         ],
         sEn: "Step 1: Connect to daily student conduct: everything should be done to meet the required standard without excessive overdoing.<br>Step 2: Give an exam example: in Chinese writing or reading comprehension, answer precisely to the point without adding irrelevant text that might incur penalties.",
         aZh: "教训我们做任何事都要踏实、懂得适可而止。例如我们在面对华文考试的简答题或作文时，只要清晰、准确地回答完得分点即可，千万不要为了充字数而写一堆无关的废话（画蛇添足），否则往往多说多错，反而被扣除分数。",
