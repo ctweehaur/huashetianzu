@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 1. 修改了网页标签的标题 -->
+    <title>互动古文：画蛇添足 · 《战国策·齐策二》 (中英双语·词解版)</title>
+    
+    <!-- 引入独立CSS (保持不变) -->
+    <link rel="stylesheet" href="classic_style.css">
+    
+    <!-- 2. 修改了引入的 5 个 JS 数据包文件名 -->
+    <script src="huashetianzu_text.js"></script>
+    <script src="huashetianzu_translation.js"></script>
+    <script src="huashetianzu_analysis.js"></script>
+    <script src="huashetianzu_quiz.js"></script>
+    <script src="huashetianzu_shortq.js"></script>
+</head>
+<body>
+ 
+<div class="app-container">
+    <div class="header-section">
+        <!-- 3. 修改了网页顶部的文章大标题 -->
+        <h1 class="title">画蛇添足</h1>
+        <!-- 4. 修改了作者与出处信息 -->
+        <p class="author">《战国策·齐策二》 / 刘向编订 (西汉)</p>
+    </div>
+    
+    <div class="poem-container">
+        <!-- 古文原文动态容器 -->
+        <div id="dynamic-poem-container"></div>
+        
+        <div class="translation-block" id="translationBlock">
+            <div class="translation-header" id="translationHeader">
+                <div class="translation-title"><span>📖</span> 白话翻译</div>
+                <div class="toggle-icon" id="toggleIcon">▶</div>
+            </div>
+            <div class="translation-content" id="translationContent"></div>
+        </div>
+    </div>
+    
+    <div class="controls-wrapper">
+        <div class="control-panel"><div class="control-label">🗣️ 拼音辅助 <span>(Pinyin)</span></div><label class="switch"><input type="checkbox" id="pinyin-toggle"><span class="slider"></span></label></div>
+        <div class="control-panel"><div class="control-label">🔤 英文辅助 <span>(English)</span></div><label class="switch"><input type="checkbox" id="en-toggle"><span class="slider"></span></label></div>
+    </div>
+
+    <div class="action-group">
+        <button class="action-btn btn-analysis" id="toggle-analysis-btn"><span class="btn-icon">📜</span> 展开全诗赏析</button>
+        <button class="action-btn btn-quiz" id="toggle-quiz-btn"><span class="btn-icon">🎯</span> 客观题自测</button>
+        <button class="action-btn btn-shortq" id="toggle-shortq-btn"><span class="btn-icon">✍️</span> 简答题特训</button>
+    </div>
+ 
+    <div class="collapsible-content" id="analysis-content"></div>
+    <div class="collapsible-content" id="quiz-content"><div id="quiz-dynamic-container"></div></div>
+    <div class="collapsible-content" id="shortq-content"></div>
+</div>
+ 
+<div class="floating-tooltip" id="tooltip">
+    <div class="exp-header"><span class="exp-word" id="disp-word"></span><span class="exp-pinyin" id="disp-pinyin"></span><span class="exam-tag" id="exam-tag">考点</span></div>
+    <div class="exp-zh" id="disp-zh"></div>
+    <div class="exp-en" id="disp-en"></div>
+</div>
+ 
+<script>
+    let originalQuizQuestions = [];
+
+    // 【终极重构注音引擎】：加入最全的标点与特殊符号过滤（破折号、箭头、引号、括号），让它们自动不消耗拼音！
+  function alignText(zh, py) {
+    if (!zh) return '';
+    const chars = zh.trim().split('');
+    const pys = py ? py.trim().split(/\s+/) : [];
+    let pIdx = 0;
+    let html = '';
+    for (let c of chars) {
+        // 【核心修复】：正则表达式加入了 0-9 和 \. 让阿拉伯数字和半角点号自动变成不消耗拼音的标点样式！
+        if (/[，。？！：“”‘’（）《》、\-\:；—\(\)→\s0-9\.]/.test(c)) {
+            html += `<span class="punctuation">${c}</span>`;
+        } else {
+            const p = pys[pIdx] || '';
+            html += `<span class="char-box"><span class="py-text">${p}</span><span class="zh-text">${c}</span></span>`;
+            pIdx++;
+        }
+    }
+    return html;
+}
+
+// 同样把这个也一起改掉，确保万无一失
+function alignTextWithPrefix(prefix, zh, py) {
+    if (!zh) return '';
+    const chars = zh.trim().split('');
+    const pys = py ? py.trim().split(/\s+/) : [];
+    let html = '';
+    html += `<span class="char-box" style="margin-right: 8px !important;"><span class="py-text">&nbsp;</span><span class="zh-text" style="font-weight: bold; color: #1e293b;">${prefix}</span></span>`;
+    let pIdx = 0;
+    for (let c of chars) {
+        if (/[，。？！：“”‘’（）《》、\-\:；—\(\)→\s0-9\.]/.test(c)) {
+            html += `<span class="punctuation">${c}</span>`;
+        } else {
+            const p = pys[pIdx] || '';
+            html += `<span class="char-box"><span class="py-text">${p}</span><span class="zh-text">${c}</span></span>`;
+            pIdx++;
+        }
+    }
+    return html;
+}
+
+    window.onload = function() {
+        if (typeof quizQuestions !== 'undefined') {
+            originalQuizQuestions = JSON.parse(JSON.stringify(quizQuestions));
+        }
+        renderPoem();
+        renderTranslation();
+        renderAnalysis();
+        renderShortQ();
+        renderQuizCards(); 
+        initInteractions();
+    };
+
+    function renderPoem() {
+        const container = document.getElementById('dynamic-poem-container');
+        let html = '<div class="poem-paragraph">&emsp;&emsp;'; 
+        poemData.forEach(w => {
+            if(w.punc) {
+                html += `<span class="punctuation">${w.text.trim()}</span>`;
+            } else {
+                let examClass = w.exam ? ' word exam-focus' : ' word';
+                let examAttr = w.exam ? ' data-exam="true"' : '';
+                html += `<span class="${examClass}" data-text="${w.text.trim()}" data-pinyin="${w.py}" data-zh="${w.zh}" data-en="${w.en}"${examAttr}>${alignText(w.text, w.py)}</span>`;
+            }
+        });
+        html += '</div>';
+        container.innerHTML = html;
+    }
+
+    function renderTranslation() {
+        const container = document.getElementById('translationContent');
+        let html = '';
+        translationData.forEach((item, index) => {
+            if(index > 0) html += '<div class="trans-divider"></div>';
+            html += `
+                <div class="trans-text-line">
+                    <div class="trans-zh">${alignText(item.zh, item.py)}</div>
+                    <div class="trans-en">${item.en}</div>
+                </div>`;
+        });
+        container.innerHTML = html;
+    }
+
+    function renderAnalysis() {
+        const container = document.getElementById('analysis-content');
+        let html = '';
+        analysisData.forEach(item => {
+            html += `
+                <div class="analysis-card">
+                    <div class="ana-title-group">
+                        <h4 class="ana-header">${alignText(item.header, item.headerPy)}</h4>
+                        <div class="ana-en">${item.en}</div>
+                    </div>
+                    <div class="ana-text-group">
+                        <p class="ana-zh">${alignText(item.textZh, item.textPy)}</p>
+                        <div class="ana-en">${item.textEn}</div>
+                    </div>
+                </div>`;
+        });
+        container.innerHTML = html;
+    }
+
+    function renderShortQ() {
+        const container = document.getElementById('shortq-content');
+        if (!container) return;
+        let html = '';
+        shortQData.forEach(item => {
+            let strategyZhHtml = '';
+            
+            item.sZh.forEach((lineText, lineIdx) => {
+                if(lineIdx > 0) strategyZhHtml += '<br>';
+                const linePy = item.sPy && item.sPy[lineIdx] ? item.sPy[lineIdx] : '';
+                strategyZhHtml += `<span class="strategy-step-line">${alignText(lineText, linePy)}</span>`;
+            });
+
+            html += `
+                <div class="sa-card">
+                    <div class="sa-q-header">
+                        <div class="sa-q-num-box">
+                            <span class="sa-q-num">${item.id}</span>
+                        </div>
+                        <div class="q-text-group">
+                            <h4 class="q-zh">${alignText(item.qZh, item.qPy)}</h4>
+                        </div>
+                    </div>
+                    <div class="q-en">${item.qEn}</div>
+                    <div class="strategy-box">
+                        <div class="strategy-title">💡 答题思路</div>
+                        <div class="strategy-zh" style="display: block !important; line-height: 2.6 !important;">${strategyZhHtml}</div>
+                        <div class="strategy-en">${item.sEn}</div>
+                    </div>
+                    <button class="sa-answer-btn" onclick="toggleAnswer(this)">📖 点击查看标准答案</button>
+                    <div class="sa-answer-box">
+                        <div class="sa-model-answer">
+                            <div class="sa-badge">标准答案</div>
+                            <div class="sa-zh">${alignText(item.aZh, item.aPy)}</div>
+                            <div class="sa-en">${item.aEn}</div>
+                        </div>
+                    </div>
+                </div>`;
+        });
+        container.innerHTML = html;
+    }
+
+    function shuffleArray(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+    
+    function renderQuizCards() {
+        const container = document.getElementById('quiz-dynamic-container');
+        if (!container || originalQuizQuestions.length === 0) return;
+        container.innerHTML = '';
+        
+        const currentQuestions = JSON.parse(JSON.stringify(originalQuizQuestions));
+        
+        currentQuestions.forEach(q => {
+            shuffleArray(q.options); 
+            
+            const card = document.createElement('div');
+            card.className = 'quiz-card';
+            card.setAttribute('data-qid', q.id);
+            let optionsHtml = '';
+            const letters = ['A.', 'B.', 'C.', 'D.'];
+            
+            q.options.forEach((opt, idx) => {
+                const optLetter = letters[idx];
+                optionsHtml += `
+                    <button class="option-btn" data-correct="${opt.correct}" data-explanation-correct="${opt.correct ? opt.explanation : ''}" data-explanation-correct-py="${opt.correct ? opt.explanationPy : ''}" data-explanation-correct-en="${opt.correct ? opt.explanationEn : ''}" data-explanation-wrong="${!opt.correct ? opt.explanation : ''}" data-explanation-wrong-py="${!opt.correct ? opt.explanationPy : ''}" data-explanation-wrong-en="${!opt.correct ? opt.explanationEn : ''}" data-opt-text="${opt.text}" data-opt-py="${opt.py}" data-opt-en="${opt.en}">
+                        <div class="opt-zh">
+                            ${alignTextWithPrefix(optLetter, opt.text, opt.py)}
+                        </div>
+                        <div class="quiz-option-en">
+                            ${opt.en}
+                        </div>
+                    </button>`;
+            });
+            
+            card.innerHTML = `
+                <div class="question-header">
+                    <div class="q-zh-wrapper">
+                        ${alignTextWithPrefix(q.id + '.', q.text, q.py)}
+                    </div>
+                    <div class="q-en">
+                        ${q.en}
+                    </div>
+                </div>
+                <div class="options-area">${optionsHtml}</div>
+                <div class="feedback"></div>`;
+            container.appendChild(card);
+            
+            const optsDiv = card.querySelector('.options-area');
+            const btns = optsDiv.querySelectorAll('.option-btn');
+            const fbDiv = card.querySelector('.feedback');
+            btns.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    if (this.disabled) return;
+                    const isCorrect = this.getAttribute('data-correct') === 'true';
+                    const correctBtn = Array.from(btns).find(b => b.getAttribute('data-correct') === 'true');
+                    const correctOptText = correctBtn ? correctBtn.getAttribute('data-opt-text') : '正确选项';
+                    const correctOptPy = correctBtn ? correctBtn.getAttribute('data-opt-py') : '';
+                    const correctOptEn = correctBtn ? correctBtn.getAttribute('data-opt-en') : '';
+                    
+                    btns.forEach(b => b.disabled = true);
+                    if (isCorrect) {
+                        this.classList.add('correct');
+                        const explanation = this.getAttribute('data-explanation-correct');
+                        const explanationPy = this.getAttribute('data-explanation-correct-py');
+                        const explanationEn = this.getAttribute('data-explanation-correct-en');
+                        fbDiv.className = 'feedback success';
+                        fbDiv.innerHTML = `
+                            <div class="fb-line"><span class="fb-label success-txt">✅ 回答正确！</span></div>
+                            <div class="fb-line"><span class="fb-label">📖 正确解析：</span><span class="fb-content">${alignText(explanation, explanationPy)}</span></div>
+                            <div class="fb-en">💬 Correct Explanation: ${explanationEn}</div>`;
+                    } else {
+                        this.classList.add('wrong');
+                        const wrongExp = this.getAttribute('data-explanation-wrong');
+                        const wrongExpPy = this.getAttribute('data-explanation-wrong-py');
+                        const wrongExpEn = this.getAttribute('data-explanation-wrong-en');
+                        
+                        const correctExp = correctBtn ? correctBtn.getAttribute('data-explanation-correct') : "";
+                        const correctExpPy = correctBtn ? correctBtn.getAttribute('data-explanation-correct-py') : "";
+                        const correctExpEn = correctBtn ? correctBtn.getAttribute('data-explanation-correct-en') : "";
+                        
+                        fbDiv.className = 'feedback error';
+                        fbDiv.innerHTML = `
+                            <div class="fb-line"><span class="fb-label error-txt">❌ 回答错误。正确答案是：</span><span class="fb-content-main">${correctOptText}</span></div>
+                            <div class="fb-en">💬 Correct Answer: ${correctOptEn}</div>
+                            <div class="fb-line" style="margin-top: 8px;"><span class="fb-label">📖 你选择的选项分析：</span><span class="fb-content">${alignText(wrongExp, wrongExpPy)}</span></div>
+                            <div class="fb-en">💬 Your Choice Analysis: ${wrongExpEn}</div>
+                            <div class="fb-line" style="margin-top: 8px;"><span class="fb-label">📖 正确选项解析：</span><span class="fb-content">${alignText(correctExp, correctExpPy)}</span></div>
+                            <div class="fb-en">💬 Correct Option Analysis: ${correctExpEn}</div>`;
+                    }
+                });
+            });
+        });
+    }
+
+    function initInteractions() {
+        const translationHeader = document.getElementById('translationHeader');
+        const translationContent = document.getElementById('translationContent');
+        const toggleIcon = document.getElementById('toggleIcon');
+        translationHeader.addEventListener('click', function() {
+            if (translationContent.classList.contains('show')) {
+                translationContent.classList.remove('show');
+                toggleIcon.textContent = '▶';
+            } else {
+                translationContent.classList.add('show');
+                toggleIcon.textContent = '▼';
+            }
+        });
+        
+        const pinyinToggle = document.getElementById('pinyin-toggle');
+        const enToggle = document.getElementById('en-toggle');
+        
+        document.body.classList.add('hide-pinyin', 'hide-english');
+        pinyinToggle.addEventListener('change', function() { 
+            if (this.checked) document.body.classList.remove('hide-pinyin'); 
+            else document.body.classList.add('hide-pinyin'); 
+        });
+        enToggle.addEventListener('change', function() { 
+            if (this.checked) document.body.classList.remove('hide-english'); 
+            else document.body.classList.add('hide-english'); 
+        });
+
+        const words = document.querySelectorAll('.word');
+        const tooltip = document.getElementById('tooltip');
+        const dispWord = document.getElementById('disp-word');
+        const dispPinyin = document.getElementById('disp-pinyin');
+        const dispZh = document.getElementById('disp-zh');
+        const dispEn = document.getElementById('disp-en');
+        const examTag = document.getElementById('exam-tag');
+        
+        words.forEach(word => {
+            word.addEventListener('click', function(e) {
+                e.stopPropagation();
+                words.forEach(w => w.classList.remove('active'));
+                this.classList.add('active');
+                
+                dispWord.innerText = this.getAttribute('data-text');
+                dispPinyin.innerText = this.getAttribute('data-pinyin');
+                dispZh.innerHTML = `<strong>解析：</strong> ${this.getAttribute('data-zh')}`;
+                dispEn.innerText = this.getAttribute('data-en');
+                examTag.style.display = (this.getAttribute('data-exam') === 'true') ? 'inline-block' : 'none';
+                
+                tooltip.style.display = 'block';
+                const rect = this.getBoundingClientRect();
+                tooltip.style.top = `${rect.top + window.scrollY - tooltip.offsetHeight - 20}px`;
+                tooltip.style.left = `${rect.left + window.scrollX + rect.width/2}px`;
+                setTimeout(() => tooltip.classList.add('show'), 10);
+            });
+        });
+        
+        document.addEventListener('click', function(e) {
+            if (!tooltip.contains(e.target) && !e.target.closest('.word')) {
+                tooltip.classList.remove('show');
+                words.forEach(w => w.classList.remove('active'));
+                setTimeout(() => { if (!tooltip.classList.contains('show')) tooltip.style.display = 'none'; }, 300);
+            }
+        });
+
+        const panels = [
+            { btnId: 'toggle-analysis-btn', contentId: 'analysis-content', defaultHTML: '<span class="btn-icon">📜</span> 展开全诗赏析', defaultBg: 'linear-gradient(135deg, #10b981, #059669)' },
+            { btnId: 'toggle-quiz-btn', contentId: 'quiz-content', defaultHTML: '<span class="btn-icon">🎯</span> 客观题自测', defaultBg: 'linear-gradient(135deg, #3b82f6, #2563eb)' },
+            { btnId: 'toggle-shortq-btn', contentId: 'shortq-content', defaultHTML: '<span class="btn-icon">✍️</span> 简答题特训', defaultBg: 'linear-gradient(135deg, #8b5cf6, #6d28d9)' }
+        ];
+        
+        panels.forEach(panel => {
+            const btn = document.getElementById(panel.btnId);
+            btn.addEventListener('click', function() {
+                const content = document.getElementById(panel.contentId);
+                const isOpen = content.style.display === 'block';
+                
+                panels.forEach(p => {
+                    document.getElementById(p.contentId).style.display = 'none';
+                    const pb = document.getElementById(p.btnId);
+                    pb.innerHTML = p.defaultHTML;
+                    pb.style.background = p.defaultBg;
+                });
+                
+                if (!isOpen) { 
+                    content.style.display = 'block'; 
+                    btn.innerHTML = '<span class="btn-icon">⬆️</span> 收起当前面板并重置题目'; 
+                    btn.style.background = '#64748b';
+                    
+                    if (panel.btnId === 'toggle-quiz-btn') {
+                        renderQuizCards();
+                    }
+                } else {
+                    if (panel.btnId === 'toggle-quiz-btn') {
+                        renderQuizCards();
+                    }
+                }
+            });
+        });
+    }
+
+    function toggleAnswer(btn) {
+        const answerBox = btn.nextElementSibling;
+        if (answerBox.style.display === 'block') {
+            answerBox.style.display = 'none';
+            btn.innerHTML = '📖 点击查看标准答案';
+        } else {
+            answerBox.style.display = 'block';
+            btn.innerHTML = '📖 收起答案';
+        }
+    }
+</script>
+</body>
+</html>
