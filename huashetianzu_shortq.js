@@ -18,7 +18,7 @@ const shortQData = [
         ],
         sEn: "Step 1: Refer to the textual sentence 'If several drink it, it is insufficient; if one drinks it, it is plenty'.<br>Step 2: Explain that because the wine was scarce, sharing would benefit no one, so a contest decided the sole winner.",
         aZh: "因为门客们认为这壶酒如果几个人一起分着喝就不够，如果给一个人单独喝就会有剩余。为了公平决定这壶酒归谁独享，他们才决定通过在地上画蛇的比赛来定胜负。",
-        aPy: "yīn wèi shè rén men rèn wéi zhè hú jiǔ rú guǒ shù rén yī qǐ fēn zhe hē jiù bú zú rú guǒ gěi yī rén dān dú hē jiù huì yǒu yú wèi le gōng píng jué dìng zhè hú jiǔ guī shéi dú xiǎng tā men cái jué dìng tōng guò zài dì shàng huà shé de bǐ sài lái dìng shèng fù",
+        aPy: "yīn wèi mén kè men rèn wéi zhè hú jiǔ rú guǒ jǐ rén yī qǐ fēn zhe hē jiù bú gòu rú guǒ gěi yī gè rén dān dú hē jiù huì yǒu yú wèi le gōng píng jué dìng zhè hú jiǔ guī shéi dú xiǎng tā men cái jué dìng tōng guò zài dì shàng huà shé de bǐ sài lái dìng shèng fù",
         aEn: "Because the retainers realized that the wine would be insufficient if shared among many, but plenty for a single person. To fairly decide who would enjoy it alone, they agreed on a competitive race to draw a snake."
     },
     {
